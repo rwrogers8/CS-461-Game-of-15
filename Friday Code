@@ -1,0 +1,285 @@
+import numpy as np
+import random
+from time import sleep
+
+
+ValuesOdd = [1, 3, 5, 7, 9]
+ValuesEven = [2, 4, 6, 8]
+
+# Creates an empty board
+def create_board():
+    return(np.array([[0, 0, 0],
+                     [0, 0, 0],
+                     [0, 0, 0]]))
+ 
+# Check for empty places on board
+def possibilities(board):
+    l = []
+ 
+    for i in range(len(board)):
+        for j in range(len(board)):
+ 
+            if board[i][j] == 0:
+                l.append((i, j))
+    return(l)
+
+# Make a good move based off of given board
+def good_move(board,player):
+    temp_board = board
+    possibleLocations = possibilities(temp_board)
+    bestMove = None
+    bestValue = -9999
+    values = ValuesEven
+    if (player == 1):
+        values = ValuesOdd
+    for x in possibleLocations:
+        for i in values:
+            temp_board[x] = i
+            boardValue = evaluation(temp_board,player)
+            if(boardValue > bestValue):
+                bestValue = boardValue
+                bestMove = i,x
+            temp_board[x] = 0
+    return bestMove
+
+def make_move(board,move):
+    current_loc = move[1]
+    selectedVal = move[0]
+    board[current_loc] = selectedVal
+    
+    return board
+    
+# Evaluation function
+def evaluation(board,player):
+    botPicks = ValuesEven
+    inputPicks = ValuesOdd 
+    if (myInputPlayer == 2):
+        inputPicks = ValuesEven
+        botPicks = ValuesOdd
+        
+    evaluation = 0
+    
+    sumOne = board[0,0] + board[0,1] + board[0,2]
+    sumTwo = board[1,0] + board[1,1] + board[1,2]
+    sumThree = board[2,0] + board[2,1] + board[2,2]
+    sumFour = board[0,0] + board[1,0] + board[2,0]
+    sumFive = board[0,1] + board[1,1] + board[2,1]
+    sumSix = board[0,2] + board[1,2] + board[2,2]
+    sumSeven = board[0,0] + board[1,1] + board[2,2]
+    sumEight = board[0,2] + board[1,1] + board[2,0]
+    rowCountOne = 0
+    rowCountTwo = 0
+    rowCountThree = 0
+    rowCountFour = 0
+    rowCountFive = 0
+    rowCountSix = 0
+    rowCountSeven = 0
+    rowCountEight = 0
+    if (board[0,0] != 0):
+        rowCountOne = rowCountOne + 1
+        rowCountFour = rowCountFour + 1
+        rowCountSeven = rowCountSeven + 1
+    if (board[0,1] != 0):
+        rowCountOne = rowCountOne + 1
+        rowCountFive = rowCountFive + 1
+    if (board[0,2] != 0):
+        rowCountOne = rowCountOne + 1
+        rowCountEight = rowCountEight + 1
+        rowCountSix = rowCountSix + 1
+    if (board[1,0] != 0):
+        rowCountFour = rowCountFour + 1
+        rowCountTwo = rowCountTwo + 1
+    if (board[1,1] != 0):
+        rowCountSeven = rowCountSeven + 1
+        rowCountEight = rowCountEight + 1
+        rowCountTwo = rowCountTwo + 1
+        rowCountFive = rowCountFive + 1
+    if (board[1,2] != 0):
+        rowCountTwo = rowCountTwo + 1
+        rowCountSix = rowCountSix + 1
+    if (board[2,0] != 0):
+        rowCountThree = rowCountThree + 1
+        rowCountFour = rowCountFour + 1
+        rowCountEight = rowCountEight + 1
+    if (board[2,1] != 0):
+        rowCountThree = rowCountThree + 1
+        rowCountFive = rowCountFive + 1
+    if (board[2,2] != 0):
+        rowCountThree = rowCountThree + 1
+        rowCountSix = rowCountSix + 1
+        rowCountSeven = rowCountSeven + 1
+    
+    # board is won
+    if ((rowCountOne == 3 and sumOne == 15) or (rowCountTwo == 3 and sumTwo == 15) or 
+        (rowCountThree == 3 and sumThree == 15) or (rowCountFour == 3 and sumFour == 15)
+        or (rowCountFive == 3 and sumFive == 15) or (rowCountSix == 3 and sumSix == 15) or
+        (rowCountSeven == 3 and sumSeven == 15) or (rowCountEight == 3 and sumEight == 15)):
+        evaluation = evaluation + 2
+        #print("Won points")
+    elif ((rowCountOne == 3) or (rowCountTwo == 3) or 
+        (rowCountThree == 3) or (rowCountFour == 3)
+        or (rowCountFive == 3) or (rowCountSix == 3) or
+        (rowCountSeven == 3) or (rowCountEight == 3)):
+        evaluation = evaluation + 1
+        #print("Prevent win points")
+    for i in inputPicks:
+        if ((rowCountOne == 2 and i + sumOne == 15) or (rowCountTwo == 2 and i + sumTwo == 15) or 
+            (rowCountThree == 2 and i + sumThree == 15) or (rowCountFour == 2 and i + sumFour == 15)
+            or (rowCountFive == 2 and i + sumFive == 15) or (rowCountSix == 2 and i + sumSix == 15) or
+            (rowCountSeven == 2 and i + sumSeven == 15) or (rowCountEight == 2 and i + sumEight == 15)):
+            evaluation = evaluation - 1
+    return (evaluation)
+                        
+def random_place(board, player):
+    selection = possibilities(board)
+    global recentMove
+    if (player != myInputPlayer):
+        #print(tree_move(board,player))
+        current_loc = good_move(board,player)[1]
+        selectedVal = good_move(board,player)[0]
+        board[current_loc] = selectedVal
+        recentMove = selectedVal
+        if (player == 2):
+            ValuesEven.remove(selectedVal)
+        else:
+            ValuesOdd.remove(selectedVal)
+    elif (player == myInputPlayer):
+        if (player == 2):
+            print("Your options are: " + str(ValuesEven))
+        else:
+            print("Your options are: " + str(ValuesOdd))
+        current_loc = input('Position?\n')
+        if (current_loc == "1"):
+            loc = (0,0)
+        elif (current_loc == "2"):
+            loc = (0,1)
+        elif (current_loc == "3"):
+            loc = (0,2)
+        elif (current_loc == "4"):
+            loc = (1,0)
+        elif (current_loc == "5"):
+            loc = (1,1)
+        elif (current_loc == "6"):
+            loc = (1,2)
+        elif (current_loc == "7"):
+            loc = (2,0)
+        elif (current_loc == "8"):
+            loc = (2,1)
+        elif (current_loc == "9"):
+            loc = (2,2)
+        selectedVal = int(input('What number do you select?\n'))
+        board[loc] = selectedVal
+        recentMove = selectedVal
+        if (player == 2):
+            ValuesEven.remove(selectedVal)
+        else:
+            ValuesOdd.remove(selectedVal)
+                   
+    return (board)
+ 
+# Checks whether the player has three of their marks in a horizontal row
+def row_win(board, player):
+    win = False
+    if ((board[0,0] + board[0,1] + board [0,2]) == 15) and (board[0,0] != 0 and board[0,1] != 0 and board [0,2] != 0):
+        win = True
+    elif ((board[1,0] + board[1,1] + board [1,2]) == 15) and (board[1,0] != 0 and board[1,1] != 0 and board [1,2] != 0):
+        win = True
+    elif ((board[2,0] + board[2,1] + board [2,2]) == 15) and (board[2,0] != 0 and board[2,1] != 0 and board [2,2] != 0):
+        win = True
+    return(win)
+ 
+# Checks whether the player has three of their marks in a vertical row
+def col_win(board, player):
+    win = False
+    if ((board[0,0] + board[1,0] + board [2,0]) == 15) and (board[0,0] != 0 and board[1,0] != 0 and board [2,0] != 0):
+        win = True
+    elif ((board[0,1] + board[1,1] + board [2,1]) == 15) and (board[0,1] != 0 and board[1,1] != 0 and board [2,1] != 0):
+        win = True
+    elif ((board[0,2] + board[1,2] + board [2,2]) == 15) and (board[0,2] != 0 and board[1,2] != 0 and board [2,2] != 0):
+        win = True
+    return(win)
+ 
+# Checks whether the player has three of their marks in a diagonal row
+def diag_win(board, player):
+    win = False
+    if ((board[0,0] + board[1,1] + board [2,2]) == 15) and (board[0,0] != 0 and board[1,1] != 0 and board [2,2] != 0):
+        win = True
+    elif ((board[0,2] + board[1,1] + board [2,0]) == 15) and (board[0,2] != 0 and board[1,1] != 0 and board [2,0] != 0):
+        win = True
+    return(win)
+ 
+# Evaluates whether there is a winner or a tie
+def evaluate(board):
+    winner = 0
+ 
+    for player in [1, 2]:
+        if (row_win(board, player) or
+                col_win(board, player) or
+                diag_win(board, player)):
+ 
+            winner = player
+ 
+    if np.all(board != 0) and winner == 0:
+        winner = -1
+    return winner
+ 
+# Main function to start the game
+def play_game():
+    board, winner, counter = create_board(), 0, 1
+    print(board)
+    sleep(1)
+ 
+    while winner == 0:
+        for player in [1, 2]:
+            board = random_place(board, player)
+            print("Board after " + str(counter) + " move")
+            print(board)
+            counter += 1
+            winner = evaluate(board)
+            if winner != 0:
+                break
+    return(winner)
+ 
+ 
+# Driver Code
+#myInputPlayer = int(input('Type 1 to input odd, type 2 to input even:\n'))
+#print("Winner is: " + str(play_game()))
+
+# values
+ValuesOdd = [1, 3, 5, 7, 9]
+ValuesEven = [2, 4, 6, 8]
+myInputPlayer = 0
+
+# take input board from opponent
+input_board =list(map(int, input("Row-wise representation of board: ").strip().split()))
+print(input_board)
+
+# get rid of values that have already been used
+for i in input_board:
+    if i in ValuesOdd:
+        ValuesOdd.remove(i)
+    elif i in ValuesEven:
+        ValuesEven.remove(i)
+
+# convert to np array
+input_board = np.array(input_board)
+input_board = input_board.reshape((3,3))
+
+# get whether or not you are playing odd or even
+odd_even = int(input("Are you playing as odd or even? (1 for odd, 2 for even) \n"))
+
+# give move reccomendation if playing odd/ even
+move = good_move(input_board,odd_even)
+print("Suggested move: ",move)
+
+# make move and return the board
+return_board = make_move(input_board,move)
+print(return_board)
+return_board = return_board.reshape((9,))
+print("Return board: ",return_board)
+
+# check if the game is over
+print()
+print("Row win?: ", row_win(input_board,odd_even))
+print("Col win?: ", col_win(input_board,odd_even))
+print("Diag win?: ", diag_win(input_board,odd_even))
